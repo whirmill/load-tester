@@ -1,0 +1,52 @@
+{
+    "id": 57,
+    "sku": "3223",
+    "title": "BETA PUNZONE 30 125MM 2 ",
+    "inventory_quantity": "13.0000",
+    "price": 4.332,
+    "gtg_price": 4.974,
+    "tier_prices": {
+        "Menarini": 4.172,
+        "AbbVie": 4.172,
+        "Haleon": 4.172
+    },
+    "options": [
+        {
+            "id": "212",
+            "option_id": "DIAMETRO (mm)",
+            "attribute_code": "ges_diametro",
+            "value": "2",
+            "code": "ges_diametro",
+            "label": "DIAMETRO (mm)"
+        }
+    ],
+    "attributes": {
+        "description": "punzoni cromati",
+        "esb_import_date": "2025-01-25T11:50:09+01:00",
+        "esb_import_filename": "abbvie2025125.csv",
+        "ges_diametro": "2",
+        "ges_googleshopping": "1",
+        "ges_leadtime": "9",
+        "ges_lunghezza": "125",
+        "ges_offerta": "0",
+        "ges_rifart": "000300020",
+        "ges_rifcl_ABBV": "3223",
+        "ges_um": "PZ",
+        "gift_message_available": "0",
+        "gift_wrapping_available": "0",
+        "image": "no_selection",
+        "is_returnable": "2",
+        "manufacturer": "BETA",
+        "msrp_display_actual_price_type": "0",
+        "name": "BETA PUNZONE 30 125MM 2 ",
+        "options_container": "container2",
+        "price": "4.332000",
+        "small_image": "no_selection",
+        "special_from_date": "2023-11-17 00:00:00",
+        "swatch_image": "no_selection",
+        "thumbnail": "no_selection",
+        "unspsc": "56110000",
+        "url_key": "punzone-30-125mm-2",
+        "weight": "0.059400"
+    }
+}

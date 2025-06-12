@@ -10,6 +10,7 @@ This repository contains separate implementations of the load tester in the foll
 *   **Rust:** See the `rust/` directory.
 *   **Zig:** See the `zig/` directory.
 *   **Python:** See the `python/` directory.
+*   **TypeScript/Node.js:** See the `typescript/` directory.
 
 ## Features (General)
 
@@ -52,11 +53,18 @@ load-tester/
 │   │   ├── main.zig
 │   │   └── payload.json  (expected in zig/src/)
 │   └── .env            (expected in zig/)
-└── python/         # Python implementation
-    ├── main.py
-    ├── requirements.txt
-    ├── payload.json  (expected in python/)
-    └── .env            (expected in python/)
+├── python/         # Python implementation
+│   ├── main.py
+│   ├── requirements.txt
+│   ├── payload.json  (expected in python/)
+│   └── .env            (expected in python/)
+└── typescript/     # TypeScript/Node.js implementation
+    ├── src/
+    │   └── main.ts
+    ├── package.json
+    ├── tsconfig.json
+    ├── payload.json  (expected in typescript/)
+    └── .env            (expected in typescript/)
 ```
 
 ---
@@ -250,15 +258,89 @@ YYYY-MM-DD HH:MM:SS INFO     🚀 Starting load test (Python)...
 YYYY-MM-DD HH:MM:SS INFO     Threads: 20, Requests/Thread: 50, Total: 1000
 YYYY-MM-DD HH:MM:SS INFO     Target URL: http://localhost:3000/api/foo
 YYYY-MM-DD HH:MM:SS INFO     Auth Token: Not set
-YYYY-MM-DD HH:MM:SS INFO     ----------------------------------------------------------------------
-... (individual request logs like: YYYY-MM-DD HH:MM:SS INFO     Thread  X | Request   Y/Z | Status: 200) ...
-YYYY-MM-DD HH:MM:SS INFO     ----------------------------------------------------------------------
+----------------------------------------------------------------------
+... (individual request logs) ...
+----------------------------------------------------------------------
 YYYY-MM-DD HH:MM:SS INFO     ✅ Test completed in 12345.67 ms
 YYYY-MM-DD HH:MM:SS INFO     Total requests processed: 1000
 YYYY-MM-DD HH:MM:SS INFO       -> Successes ✅: 1000
 YYYY-MM-DD HH:MM:SS INFO       -> Failures ❌: 0
-YYYY-MM-DD HH:MM:SS INFO     Performance: ~81.23 requests/second (RPS)
-YYYY-MM-DD HH:MM:SS INFO     Response times (ms): min 180.12 | avg 240.34 | max 850.56
+YYYY-MM-DD HH:MM:SS INFO     Performance: ~81.00 requests/second (RPS)
+YYYY-MM-DD HH:MM:SS INFO     Response times (ms): min 100.00 | avg 120.00 | max 250.00
+```
+
+---
+
+## TypeScript/Node.js Implementation (`typescript/`)
+
+The TypeScript/Node.js version uses `axios` for HTTP requests, `dotenv` for configuration, and Node.js `worker_threads` for concurrency. It requires compilation from TypeScript to JavaScript before running.
+
+### Prerequisites
+
+*   Node.js (e.g., LTS version, v18.x or v20.x or newer recommended).
+*   `npm` (Node Package Manager, usually comes with Node.js) or `yarn`.
+
+### Configuration
+
+1.  Create a `.env` file in the `typescript/` directory with the following variables:
+
+    ```dotenv
+    # Number of concurrent worker threads to use
+    NUM_THREADS=20
+
+    # Number of requests each thread will make
+    REQUESTS_PER_THREAD=50
+
+    # Target URL for the load test
+    TARGET_URL="http://localhost:3000/api/foo"
+
+    # (Optional) Authentication token (Bearer token)
+    AUTH_TOKEN=""
+    ```
+2.  Ensure a `payload.json` file is present in the `typescript/` directory. This file contains the JSON body for POST requests.
+
+### Building and Running
+
+Navigate to the `typescript/` directory and run:
+
+```bash
+# Install dependencies (run this once initially)
+npm install
+# or if you use yarn: yarn install
+
+# Compile TypeScript to JavaScript (creates a dist/ directory)
+npm run build
+# or yarn build
+
+# Run the load tester (executes the compiled JavaScript in dist/)
+npm start
+# or yarn start
+
+# Alternatively, to run directly using ts-node (for development, skips build step)
+# npm run dev
+# or yarn dev
+```
+Ensure the `.env` file and `payload.json` are in the `typescript/` directory when running.
+
+### Example Output (TypeScript/Node.js)
+
+```
+🚀 Starting load test (TypeScript/Node.js)...
+Threads: 20, Requests/Thread: 50, Total: 1000
+Target URL: http://localhost:3000/api/foo
+Auth Token: Not set
+----------------------------------------------------------------------
+Thread  1 | Request   1/50 | Status: 200
+Thread  2 | Request   1/50 | Status: 200
+... (more individual request logs) ...
+Thread 20 | Request  50/50 | Status: 200
+----------------------------------------------------------------------
+✅ Test completed in 1350.78 ms
+Total requests processed: 1000
+  -> Successes ✅: 1000
+  -> Failures ❌: 0
+Performance: ~740.31 requests/second (RPS)
+Response times (ms): min 5.21 | avg 12.87 | max 45.03
 ```
 
 ---
