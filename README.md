@@ -278,7 +278,7 @@ The TypeScript/Node.js version uses `axios` for HTTP requests, `dotenv` for conf
 ### Prerequisites
 
 *   Node.js (e.g., LTS version, v18.x or v20.x or newer recommended).
-*   `npm` (Node Package Manager, usually comes with Node.js) or `yarn`.
+*   `pnpm` (Performant npm). You can install it following the instructions at [pnpm.io](https://pnpm.io/installation).
 
 ### Configuration
 
@@ -305,20 +305,16 @@ Navigate to the `typescript/` directory and run:
 
 ```bash
 # Install dependencies (run this once initially)
-npm install
-# or if you use yarn: yarn install
+pnpm install
 
 # Compile TypeScript to JavaScript (creates a dist/ directory)
-npm run build
-# or yarn build
+pnpm run build
 
 # Run the load tester (executes the compiled JavaScript in dist/)
-npm start
-# or yarn start
+pnpm start
 
 # Alternatively, to run directly using ts-node (for development, skips build step)
-# npm run dev
-# or yarn dev
+# pnpm run dev
 ```
 Ensure the `.env` file and `payload.json` are in the `typescript/` directory when running.
 
