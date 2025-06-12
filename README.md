@@ -1,6 +1,6 @@
 # HTTP Load Tester Collection
 
-HTTP load testing tool with implementations in Go, Rust, and Zig. This repository explores different approaches to building high-performance load testers, providing tools to benchmark web services and compare language/runtime characteristics for this type of workload. Key metrics like RPS, success/failure counts, and response latencies are tracked.
+HTTP load testing tool with implementations in Go, Rust, Zig, and Python. This repository explores different approaches to building high-performance load testers, providing tools to benchmark web services and compare language/runtime characteristics for this type of workload. Key metrics like RPS, success/failure counts, and response latencies are tracked.
 
 ## Implementations
 
@@ -9,6 +9,7 @@ This repository contains separate implementations of the load tester in the foll
 *   **Go:** See the `go/` directory.
 *   **Rust:** See the `rust/` directory.
 *   **Zig:** See the `zig/` directory.
+*   **Python:** See the `python/` directory.
 
 ## Features (General)
 
@@ -46,11 +47,16 @@ load-tester/
 │   ├── src/
 │   │   └── main.rs
 │   └── payload.json  (expected in rust/)
-└── zig/            # Zig implementation
-    ├── src/
-    │   ├── main.zig
-    │   └── payload.json  (expected in zig/src/)
-    └── .env            (expected in zig/)
+├── zig/            # Zig implementation
+│   ├── src/
+│   │   ├── main.zig
+│   │   └── payload.json  (expected in zig/src/)
+│   └── .env            (expected in zig/)
+└── python/         # Python implementation
+    ├── main.py
+    ├── requirements.txt
+    ├── payload.json  (expected in python/)
+    └── .env            (expected in python/)
 ```
 
 ---
@@ -193,6 +199,67 @@ cargo build --release
 ./target/release/rust_load_tester
 ```
 Ensure the `.env` file (if used) and `payload.json` are in the `rust/` directory when running the compiled executable.
+
+---
+
+## Python Implementation (`python/`)
+
+The Python version uses the `requests` library for HTTP calls, `python-dotenv` for configuration, and `threading` for concurrency.
+
+### Prerequisites
+
+*   Python (e.g., version 3.8 or newer recommended).
+*   `pip` (Python package installer).
+
+### Configuration
+
+1.  Create a `.env` file in the `python/` directory with the following variables (or set them as environment variables):
+
+    ```dotenv
+    # Number of concurrent threads to use
+    NUM_THREADS=20
+
+    # Number of requests each thread will make
+    REQUESTS_PER_THREAD=50
+
+    # Target URL for the load test
+    TARGET_URL="http://localhost:3000/api/foo"
+
+    # (Optional) Authentication token (Bearer token)
+    AUTH_TOKEN=""
+    ```
+2.  Ensure a `payload.json` file is present in the `python/` directory.
+
+### Building and Running
+
+Navigate to the `python/` directory and run:
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the load tester
+python main.py
+```
+Ensure the `.env` file (if used) and `payload.json` are in the `python/` directory when running.
+
+### Example Output (Python)
+
+```
+YYYY-MM-DD HH:MM:SS INFO     🚀 Starting load test (Python)...
+YYYY-MM-DD HH:MM:SS INFO     Threads: 20, Requests/Thread: 50, Total: 1000
+YYYY-MM-DD HH:MM:SS INFO     Target URL: http://localhost:3000/api/foo
+YYYY-MM-DD HH:MM:SS INFO     Auth Token: Not set
+YYYY-MM-DD HH:MM:SS INFO     ----------------------------------------------------------------------
+... (individual request logs like: YYYY-MM-DD HH:MM:SS INFO     Thread  X | Request   Y/Z | Status: 200) ...
+YYYY-MM-DD HH:MM:SS INFO     ----------------------------------------------------------------------
+YYYY-MM-DD HH:MM:SS INFO     ✅ Test completed in 12345.67 ms
+YYYY-MM-DD HH:MM:SS INFO     Total requests processed: 1000
+YYYY-MM-DD HH:MM:SS INFO       -> Successes ✅: 1000
+YYYY-MM-DD HH:MM:SS INFO       -> Failures ❌: 0
+YYYY-MM-DD HH:MM:SS INFO     Performance: ~81.23 requests/second (RPS)
+YYYY-MM-DD HH:MM:SS INFO     Response times (ms): min 180.12 | avg 240.34 | max 850.56
+```
 
 ---
 
