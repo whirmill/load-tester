@@ -13,6 +13,7 @@ This repository contains separate implementations of the load tester in the foll
 *   **TypeScript/Node.js:** See the `typescript/` directory.
 *   **Elixir:** See the `elixir/` directory.
 *   **Perl:** See the `perl/` directory.
+*   **Bash:** See the `bash/` directory.
 
 ## Features (General)
 
@@ -80,6 +81,10 @@ load-tester/
 │   ├── main.pl
 │   ├── payload.json  (expected in perl/)
 │   └── .env            (expected in perl/)
+├── bash/           # Bash implementation
+│   ├── load_test.sh
+│   ├── payload.json  (expected in bash/)
+│   └── .env            (expected in bash/)
 ```
 
 ---
@@ -485,6 +490,59 @@ Total requests: 1000
   -> Failures ❌: 0
 Performance: ~459.76 requests/second (RPS)
 Response times (ms): min 6.45 | avg 27.12 | max 73.81
+```
+
+---
+
+## Bash Implementation (`bash/`)
+
+La versione Bash è pensata per la massima portabilità: richiede solo `bash`, `curl` e gli strumenti POSIX standard (`awk`, `date`, `mktemp`). Ogni thread viene eseguito come subshell in background, con metriche aggregate a fine test.
+
+### Prerequisiti
+
+*   Unix-like shell con `bash` 4.x o superiore.
+*   `curl`, `awk`, `date` con supporto nanosecondi (`date +%s%N`).
+
+### Configurazione
+
+1.  Creare (facoltativo) un file `.env` nella directory `bash/` con le variabili:
+
+    ```dotenv
+    NUM_THREADS=20
+    REQUESTS_PER_THREAD=50
+    TARGET_URL="http://localhost:3000/api/foo"
+    AUTH_TOKEN=""
+    PAYLOAD_FILE=payload.json
+    ```
+2.  Aggiungere `payload.json` nella stessa directory se si desidera inviare un corpo JSON; se assente, verrà inviata una richiesta vuota.
+
+### Esecuzione
+
+```bash
+cd bash
+chmod +x load_test.sh   # solo la prima volta
+./load_test.sh
+```
+
+### Output di esempio (Bash)
+
+```
+🚀 Starting load test (Bash)...
+Threads: 20, Requests/Thread: 50, Total: 1000
+Target URL: http://localhost:3000/api/foo
+Auth Token: Not set
+----------------------------------------------------------------------
+Thread  1 | Request   1/50 | Status: 200
+Thread  2 | Request   1/50 | Status: 200
+... (altri log) ...
+Thread 20 | Request  50/50 | Status: 200
+----------------------------------------------------------------------
+✅ Test completed in 4230.11 ms
+Total requests: 1000
+  -> Successes ✅: 1000
+  -> Failures  ❌: 0
+Performance: ~236.44 requests/second (RPS)
+Response times (ms): min 8.57 | avg 39.82 | max 110.24
 ```
 
 ---
