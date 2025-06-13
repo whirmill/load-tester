@@ -11,6 +11,8 @@ This repository contains separate implementations of the load tester in the foll
 *   **Zig:** See the `zig/` directory.
 *   **Python:** See the `python/` directory.
 *   **TypeScript/Node.js:** See the `typescript/` directory.
+*   **Elixir:** See the `elixir/` directory.
+*   **Haskell:** See the `haskell/` directory.
 
 ## Features (General)
 
@@ -65,6 +67,22 @@ load-tester/
     ├── tsconfig.json
     ├── payload.json  (expected in typescript/)
     └── .env            (expected in typescript/)
+├── elixir/         # Elixir implementation
+│   ├── mix.exs
+│   ├── lib/
+│   │   ├── load_tester.ex
+│   │   └── load_tester/
+│   │       └── worker.ex
+│   ├── payload.json  (expected in elixir/)
+│   ├── .env_example    (example for .env in elixir/)
+│   └── .env            (expected in elixir/)
+├── haskell/        # Haskell implementation
+│   ├── load-tester.cabal
+│   ├── app/
+│   │   └── Main.hs
+│   ├── payload.json  (expected in haskell/)
+│   ├── .env_example    (example for .env in haskell/)
+│   └── .env            (expected in haskell/)
 ```
 
 ---
@@ -337,6 +355,131 @@ Total requests processed: 1000
   -> Failures ❌: 0
 Performance: ~740.31 requests/second (RPS)
 Response times (ms): min 5.21 | avg 12.87 | max 45.03
+```
+
+---
+
+## Elixir Implementation (`elixir/`)
+
+The Elixir version uses the `HTTPoison` library for HTTP requests and `Dotenv` for configuration. It leverages Elixir's concurrency model with `GenServer` for worker management.
+
+### Prerequisites
+
+*   Elixir (e.g., version 1.12 or newer). You can find installation instructions on [elixir-lang.org](https://elixir-lang.org/install.html).
+*   Mix (Elixir's build tool, comes with Elixir).
+
+### Configuration
+
+1.  Navigate to the `elixir/` directory.
+2.  Copy `.env_example` to `.env` (i.e., `cp .env_example .env`).
+3.  Edit the `.env` file with your desired configuration:
+
+    ```dotenv
+    TARGET_URL=http://localhost:8080/test
+    REQUESTS_PER_USER=100
+    CONCURRENT_USERS=10
+    # PAYLOAD_PATH=payload.json # Optional, defaults to payload.json in the elixir/ directory
+    ```
+4.  Ensure a `payload.json` file is present in the `elixir/` directory. This file contains the JSON body for POST requests. An example is provided.
+
+### Building and Running
+
+Navigate to the `elixir/` directory and run the following commands:
+
+```bash
+# Fetch dependencies
+mix deps.get
+
+# Compile the project (optional, mix run will compile if needed)
+mix compile
+
+# Run the load tester as an escript
+# This will compile and create a self-contained executable script.
+# The .env file needs to be in the directory where you run the escript,
+# or you can set environment variables directly.
+mix escript.build
+./load_tester 
+# OR, to run directly with mix (slower startup, but good for development):
+# mix run -e "LoadTester.main([])"
+```
+Ensure the `.env` file (if used) and `payload.json` are in the `elixir/` directory when running.
+
+### Example Output (Elixir)
+
+```
+info: Starting load test with 10 concurrent users, 100 requests each.
+info: Target URL: http://localhost:8080/test
+# ... (potential worker logs if enabled, or other info messages) ...
+info: ---- Load Test Results ----
+info: Total requests: 1000
+info: Successful requests: 1000
+info: Failed requests: 0
+info: Total duration: 5.23s
+info: Requests per second (RPS): 191.20
+info: Average request duration (from workers): 45.12ms
+```
+
+---
+
+## Haskell Implementation (`haskell/`)
+
+The Haskell version uses `http-conduit` for HTTP requests, `aeson` for JSON processing, `async` for concurrency, and `dotenv` for configuration management via a `.env` file. It is built using Cabal.
+
+### Prerequisites
+
+*   Glasgow Haskell Compiler (GHC), e.g., version 8.10.7 or newer.
+*   Cabal (Haskell's build tool), e.g., version 3.2 or newer.
+    (Usually comes with GHC as part of the Haskell Platform or GHCup).
+
+### Configuration
+
+1.  Navigate to the `haskell/` directory.
+2.  Copy `.env_example` to `.env` (i.e., `cp .env_example .env`).
+3.  Edit the `.env` file with your desired configuration:
+
+    ```dotenv
+    TARGET_URL=http://localhost:8080/test
+    REQUESTS_PER_USER=100
+    CONCURRENT_USERS=10
+    PAYLOAD_PATH=payload.json
+    # AUTH_TOKEN=
+    ```
+4.  Ensure a `payload.json` file is present in the `haskell/` directory. This file contains the JSON body for POST requests. An example is provided.
+
+### Building and Running
+
+Navigate to the `haskell/` directory and run the following commands:
+
+```bash
+# Configure the project and install dependencies
+cabal update
+cabal configure
+
+# Build the executable
+cabal build
+
+# Run the load tester
+# The executable will be located in a path like dist-newstyle/build/.../load-tester-hs
+# You can run it directly or use 'cabal run'
+cabal run load-tester-hs
+```
+Ensure the `.env` file (if used) and `payload.json` are in the `haskell/` directory (or the directory from which you run the executable if it's not via `cabal run`). `cabal run` typically handles paths correctly relative to the project root.
+
+### Example Output (Haskell)
+
+```
+Target URL: http://localhost:8080/test
+Concurrent Users: 10
+Requests per User: 100
+Payload Path: payload.json
+Starting load test...
+---- Load Test Results ----
+Total requests: 1000
+Successful requests: 1000
+Failed requests: 0
+Total duration: 3.52s
+Requests per second (RPS): 284.09
+Average request duration: 30.15ms
 ```
 
 ---
