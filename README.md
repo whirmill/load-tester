@@ -12,7 +12,7 @@ This repository contains separate implementations of the load tester in the foll
 *   **Python:** See the `python/` directory.
 *   **TypeScript/Node.js:** See the `typescript/` directory.
 *   **Elixir:** See the `elixir/` directory.
-*   **Haskell:** See the `haskell/` directory.
+*   **Perl:** See the `perl/` directory.
 
 ## Features (General)
 
@@ -76,13 +76,10 @@ load-tester/
 │   ├── payload.json  (expected in elixir/)
 │   ├── .env_example    (example for .env in elixir/)
 │   └── .env            (expected in elixir/)
-├── haskell/        # Haskell implementation
-│   ├── load-tester.cabal
-│   ├── app/
-│   │   └── Main.hs
-│   ├── payload.json  (expected in haskell/)
-│   ├── .env_example    (example for .env in haskell/)
-│   └── .env            (expected in haskell/)
+├── perl/           # Perl implementation
+│   ├── main.pl
+│   ├── payload.json  (expected in perl/)
+│   └── .env            (expected in perl/)
 ```
 
 ---
@@ -421,65 +418,73 @@ info: Average request duration (from workers): 45.12ms
 
 ---
 
-## Haskell Implementation (`haskell/`)
+## Perl Implementation (`perl/`)
 
-The Haskell version uses `http-conduit` for HTTP requests, `aeson` for JSON processing, `async` for concurrency, and `dotenv` for configuration management via a `.env` file. It is built using Cabal.
+The Perl version prioritizes portability and can run on a default Perl installation. If the optional [Furl](https://metacpan.org/pod/Furl) module is available it will be used for higher throughput; otherwise it falls back to `LWP::UserAgent`.
 
 ### Prerequisites
 
-*   Glasgow Haskell Compiler (GHC), e.g., version 8.10.7 or newer.
-*   Cabal (Haskell's build tool), e.g., version 3.2 or newer.
-    (Usually comes with GHC as part of the Haskell Platform or GHCup).
+*   Perl 5.32 or newer (threads enabled in the build).
+*   Recommended CPAN modules:
+    *   `Try::Tiny` (small dependency, used to detect Furl).
+    *   `Furl` **(optional but faster)**.
+    *   `LWP::UserAgent` (already in many Perl distributions).
+
+Install them with `cpanm Try::Tiny Furl` or your preferred CPAN client.
 
 ### Configuration
 
-1.  Navigate to the `haskell/` directory.
-2.  Copy `.env_example` to `.env` (i.e., `cp .env_example .env`).
-3.  Edit the `.env` file with your desired configuration:
+1.  Create a `.env` file in the `perl/` directory with the following variables (or set them as environment variables):
 
     ```dotenv
-    TARGET_URL=http://localhost:8080/test
-    REQUESTS_PER_USER=100
-    CONCURRENT_USERS=10
-    PAYLOAD_PATH=payload.json
-    # AUTH_TOKEN=
+    # Number of concurrent threads to use
+    NUM_THREADS=20
+
+    # Number of requests each thread will make
+    REQUESTS_PER_THREAD=50
+
+    # Target URL for the load test
+    TARGET_URL="http://localhost:3000/api/foo"
+
+    # (Optional) Authentication token (Bearer token)
+    AUTH_TOKEN=""
     ```
-4.  Ensure a `payload.json` file is present in the `haskell/` directory. This file contains the JSON body for POST requests. An example is provided.
+2.  Ensure a `payload.json` file is present in the `perl/` directory. This file contains the JSON body for POST requests.
 
-### Building and Running
+### Running
 
-Navigate to the `haskell/` directory and run the following commands:
+Navigate to the `perl/` directory and run:
 
 ```bash
-# Configure the project and install dependencies
-cabal update
-cabal configure
+# Execute directly with Perl
+perl main.pl
 
-# Build the executable
-cabal build
-
-# Run the load tester
-# The executable will be located in a path like dist-newstyle/build/.../load-tester-hs
-# You can run it directly or use 'cabal run'
-cabal run load-tester-hs
+# If you want the best performance, be sure Furl is installed:
+cpanm Furl   # once, optional but recommended
+perl main.pl
 ```
-Ensure the `.env` file (if used) and `payload.json` are in the `haskell/` directory (or the directory from which you run the executable if it's not via `cabal run`). `cabal run` typically handles paths correctly relative to the project root.
 
-### Example Output (Haskell)
+Ensure the `.env` file (if used) and `payload.json` are in the `perl/` directory when running.
+
+### Example Output (Perl)
 
 ```
-Target URL: http://localhost:8080/test
-Concurrent Users: 10
-Requests per User: 100
-Payload Path: payload.json
-Starting load test...
----- Load Test Results ----
+🚀 Starting load test (Perl)...
+Threads: 20, Requests/Thread: 50, Total: 1000
+Target URL: http://localhost:3000/api/foo
+Auth Token: Not set
+----------------------------------------------------------------------
+Thread  1 | Request   1/50 | Status: 200
+Thread  2 | Request   1/50 | Status: 200
+... (more individual request logs) ...
+Thread 20 | Request  50/50 | Status: 200
+----------------------------------------------------------------------
+✅ Test completed in 2175.42 ms
 Total requests: 1000
-Successful requests: 1000
-Failed requests: 0
-Total duration: 3.52s
-Requests per second (RPS): 284.09
-Average request duration: 30.15ms
+  -> Successes ✅: 1000
+  -> Failures ❌: 0
+Performance: ~459.76 requests/second (RPS)
+Response times (ms): min 6.45 | avg 27.12 | max 73.81
 ```
 
 ---
